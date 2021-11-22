@@ -1,8 +1,55 @@
-from talon import Module, Context, noise, actions, ctrl, cron
-from talon_plugins.eye_mouse import config, toggle_control
 from time import sleep, time
+import os
 
-mod = Module() 
+from talon import (
+    Module,
+    actions,
+    app,
+    clip,
+    cron,
+    ctrl,
+    imgui,
+    noise,
+    ui,
+)
+from talon_plugins import eye_mouse, eye_zoom_mouse
+from talon_plugins.eye_mouse import config, toggle_camera_overlay, toggle_control
+
+key = actions.key
+self = actions.self
+scroll_amount = 0
+click_job = None
+scroll_job = None
+gaze_job = None
+cancel_scroll_on_pop = True
+control_mouse_forced = False
+
+
+mod = Module()
+mod.list(
+    "mouse_button", desc="List of mouse button words to mouse_click index parameter"
+)
+
+setting_mouse_continuous_scroll_amount = mod.setting(
+    "mouse_continuous_scroll_amount",
+    type=int,
+    default=80,
+    desc="The default amount used when scrolling continuously",
+)
+setting_mouse_wheel_down_amount = mod.setting(
+    "mouse_wheel_down_amount",
+    type=int,
+    default=120,
+    desc="The amount to scroll up/down (equivalent to mouse wheel on Windows by default)",
+)
+setting_mouse_wheel_horizontal_amount = mod.setting(
+    "mouse_wheel_horizontal_amount",
+    type=int,
+    default=40,
+    desc="The amount to scroll left/right",
+)
+
+continuous_scoll_mode = ""
 
 start = 0
 running = False
@@ -39,14 +86,14 @@ class MouseActions:
                 print('toggle secondary')
                 toggle_control(not config.control_mouse)
                 if(not config.control_mouse):
-                    noise.unregister('pop', MouseActions.leftClick)
-                    noise.register('pop', MouseActions.rightClick)
+                    MouseActions.unRegPrim()
+                    MouseActions.regSec()
                 else:
-                    noise.unregister('pop', MouseActions.rightClick)
-                    noise.register('pop', MouseActions.leftClick)
-
+                    MouseActions.unRegSec()
+                    MouseActions.regPrim()
+                    
     def leftClick(arg: int):
-        """This does a simple right click."""
+        """This does a simple left click."""
         ctrl.mouse_click(button=0, hold=16000)
           
     def rightClick(arg: int):
@@ -67,40 +114,194 @@ class MouseActions:
         for button in buttons_held_down:
             ctrl.mouse_click(button=button, up=True)
       
+    def regPrim():
+        """This allows hissing to switch into the secondary mode."""
+        print('register 1')
+        noise.register('pop', MouseActions.leftClick)
+        
+    def unRegPrim():
+        """This disables the switching of modes when hissing."""
+        print('unregister 1')  
+        noise.unregister('pop', MouseActions.leftClick)  
+        
     def regSec():
         """This allows hissing to switch into the secondary mode."""
-        print('register')
-        noise.register('hiss', MouseActions.mouse_secondary_mode)
+        print('register 2')
+        noise.register('pop', MouseActions.rightClick)
         
     def unRegSec():
         """This disables the switching of modes when hissing."""
-        print('unregister')
+        print('unregister 2')
+        noise.unregister('pop', MouseActions.rightClick)
+        
+    def regAlt():
+        """This allows hissing to switch into the alternative mode."""
+        print('register a')
+        noise.register('hiss', MouseActions.mouse_secondary_mode)
+        
+    def unRegAlt():
+        """This disallows hissing to switch into the alternative mode."""
+        print('unregister a')
         noise.unregister('hiss', MouseActions.mouse_secondary_mode)
+        
+    def turnOnMouseControl():
+        """This enables controlling the mouse."""
+        toggle_control(True)
         
     def turnOffMouseControl():
         """This disables controlling the mouse."""
         toggle_control(False)
         
-    def turnOnMouseControl():
-        """This enables controlling the mouse."""
-        if(not config.control_mouse):
-            toggle_control(True)
-        
-    def enter_command_mode(arg: int):
+    def enter_command_mode(is_active: int):
         """This switches from dictation mode to command mode."""
-        if arg:
-            MouseActions.unRegSwitchCommand()
+        if not is_active:
+            actions.mode.disable("sleep")
             actions.mode.disable("dictation")
             actions.mode.enable("command")
-            MouseActions.turnOnMouseControl()
             
-            #the end of the hissing noise can trigger the secondary mode, if it's registered too early
-            cron.after(noise_length_threshold, MouseActions.regSec)
+            actions.user.turnOnMouseControl()
+            actions.user.regPrim()
+            actions.user.regAlt()
+            #unregistering the method while still in it, seems to be a problem
+            cron.after(noise_length_threshold, MouseActions.unRegSwitchCommand) 
+            
         
     def regSwitchCommand():
         """This allows hissing to switch from dictation mode to command mode."""
-        noise.register('hiss', MouseActions.enter_command_mode)
+        print('register b') 
+        noise.register('pop', MouseActions.enter_command_mode)
         
     def unRegSwitchCommand():
         """This disables hissing to switch from dictation mode to command mode."""
-        noise.unregister('hiss', MouseActions.enter_command_mode)
+        print('unregister b')
+        noise.unregister('pop', MouseActions.enter_command_mode)
+        
+    def mouse_calibrate():
+        """Start calibration"""
+        eye_mouse.calib_start()
+
+    def mouse_scroll_down(amount: float = 1):
+        """Scrolls down"""
+        mouse_scroll(amount * setting_mouse_wheel_down_amount.get())()
+
+    def mouse_scroll_down_continuous():
+        """Scrolls down continuously"""
+        global continuous_scoll_mode
+        continuous_scoll_mode = "scroll down continuous"
+        mouse_scroll(setting_mouse_continuous_scroll_amount.get())()
+
+        if scroll_job is None:
+            start_scroll()
+
+    def mouse_scroll_up(amount: float = 1):
+        """Scrolls up"""
+        mouse_scroll(-amount * setting_mouse_wheel_down_amount.get())()
+
+    def mouse_scroll_up_continuous():
+        """Scrolls up continuously"""
+        global continuous_scoll_mode
+        continuous_scoll_mode = "scroll up continuous"
+        mouse_scroll(-setting_mouse_continuous_scroll_amount.get())()
+
+        if scroll_job is None:
+            start_scroll()
+
+    def mouse_scroll_left(amount: float = 1):
+        """Scrolls left"""
+        actions.mouse_scroll(0, -amount * setting_mouse_wheel_horizontal_amount.get())
+
+    def mouse_scroll_right(amount: float = 1):
+        """Scrolls right"""
+        actions.mouse_scroll(0, amount * setting_mouse_wheel_horizontal_amount.get())
+
+    def mouse_scroll_stop():
+        """Stops scrolling"""
+        stop_scroll()
+
+    def mouse_gaze_scroll():
+        """Starts gaze scroll"""
+        global continuous_scoll_mode
+        continuous_scoll_mode = "gaze scroll"
+
+        start_cursor_scrolling()
+
+
+
+def mouse_scroll(amount):
+    def scroll():
+        global scroll_amount
+        if continuous_scoll_mode:
+            if (scroll_amount >= 0) == (amount >= 0):
+                scroll_amount += amount
+            else:
+                scroll_amount = amount
+        actions.mouse_scroll(y=int(amount))
+
+    return scroll
+
+
+def scroll_continuous_helper():
+    global scroll_amount
+    # print("scroll_continuous_helper")
+    if scroll_amount and (
+        eye_zoom_mouse.zoom_mouse.state == eye_zoom_mouse.STATE_IDLE
+    ):  # or eye_zoom_mouse.zoom_mouse.state == eye_zoom_mouse.STATE_SLEEP):
+        actions.mouse_scroll(by_lines=False, y=int(scroll_amount / 10))
+
+
+def start_scroll():
+    global scroll_job
+    scroll_job = cron.interval("60ms", scroll_continuous_helper)
+    # if eye_zoom_mouse.zoom_mouse.enabled and eye_mouse.mouse.attached_tracker is not None:
+    #    eye_zoom_mouse.zoom_mouse.sleep(True)
+
+
+def gaze_scroll():
+        x, y = ctrl.mouse_pos()
+        # the rect for the window containing the mouse
+        rect = None
+
+        # on windows, check the active_window first since ui.windows() is not z-ordered
+        if app.platform == "windows" and ui.active_window().rect.contains(x, y):
+            rect = ui.active_window().rect
+        else:
+            windows = ui.windows()
+            for w in windows:
+                if w.rect.contains(x, y):
+                    rect = w.rect
+                    break
+
+        if rect is None:
+            # print("no window found!")
+            return
+
+        midpoint = rect.y + rect.height / 2
+        amount = int(((y - midpoint) / (rect.height / 10)) ** 3)
+        actions.mouse_scroll(by_lines=False, y=amount)
+
+    # print(f"gaze_scroll: {midpoint} {rect.height} {amount}")
+
+
+def stop_scroll():
+    global scroll_amount, scroll_job, gaze_job, continuous_scoll_mode
+    scroll_amount = 0
+    if scroll_job:
+        cron.cancel(scroll_job)
+
+    if gaze_job:
+        cron.cancel(gaze_job)
+    
+    scroll_job = None
+    gaze_job = None
+
+    continuous_scoll_mode = ""
+
+
+def start_cursor_scrolling():
+    global scroll_job, gaze_job
+    stop_scroll()
+    gaze_job = cron.interval("60ms", gaze_scroll)
+
+
+
+    

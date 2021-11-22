@@ -6,18 +6,13 @@ mode: all
     mode.enable("dictation")
     user.code_clear_language_mode()
 	
-	user.unRegSec()
+	user.unRegAlt()
+	user.unRegPrim()
 	user.turnOffMouseControl()
 	user.regSwitchCommand()
 	
 ^command mode$:
-    mode.disable("sleep")
-    mode.disable("dictation")
-    mode.enable("command")
-	
-	user.unRegSwitchCommand()
-	user.regSec()
-	user.turnOnMouseControl()
+	user.enter_command_mode(0)
 	
 ^talon sleep$:
     mode.disable("dictation")
