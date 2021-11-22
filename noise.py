@@ -19,7 +19,7 @@ class MouseActions:
             threshold_passed = True
             #if controlling the mouse is enabled a drag motion is started
             if(config.control_mouse):
-                actions.user.mouse_drag(0)
+                MouseActions.mouse_drag(0)
  
     def mouse_secondary_mode(is_active: int):
         """This mode is used for stopping the mouse and right clicking."""
@@ -34,20 +34,38 @@ class MouseActions:
             running = False
             if threshold_passed:
                 threshold_passed = False
-                actions.user.mouse_drag_end()
+                MouseActions.mouse_drag_end()
             else:
                 print('toggle secondary')
-                actions.user.mouse_toggle_control_mouse()
+                toggle_control(not config.control_mouse)
                 if(not config.control_mouse):
+                    noise.unregister('pop', MouseActions.leftClick)
                     noise.register('pop', MouseActions.rightClick)
                 else:
                     noise.unregister('pop', MouseActions.rightClick)
+                    noise.register('pop', MouseActions.leftClick)
 
-        
+    def leftClick(arg: int):
+        """This does a simple right click."""
+        ctrl.mouse_click(button=0, hold=16000)
           
     def rightClick(arg: int):
         """This does a simple right click."""
         ctrl.mouse_click(button=1, hold=16000)
+        
+    def mouse_drag(button: int):
+        """Press and hold/release a specific mouse button for dragging"""
+        # Clear any existing drags
+        MouseActions.mouse_drag_end()
+
+        # Start drag
+        ctrl.mouse_click(button=button, down=True)
+      
+    def mouse_drag_end():
+        """ Releases any held mouse buttons """
+        buttons_held_down = list(ctrl.mouse_buttons_down())
+        for button in buttons_held_down:
+            ctrl.mouse_click(button=button, up=True)
       
     def regSec():
         """This allows hissing to switch into the secondary mode."""
