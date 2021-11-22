@@ -1,3 +1,5 @@
+mode: all
+-
 ^dictation mode$:
     mode.disable("sleep")
     mode.disable("command")
@@ -21,7 +23,3 @@
     mode.disable("dictation")
     mode.disable("command")
     mode.enable("sleep")
-
-	user.unRegSec()
-	user.turnOffMouseControl()
-	user.unRegSwitchCommand()
