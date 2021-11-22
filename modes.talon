@@ -1,11 +1,8 @@
-not mode: sleep
--
 ^dictation mode$:
     mode.disable("sleep")
     mode.disable("command")
     mode.enable("dictation")
     user.code_clear_language_mode()
-    mode.disable("user.gdb")
 	
 	user.unRegSec()
 	user.turnOffMouseControl()
@@ -16,6 +13,15 @@ not mode: sleep
     mode.disable("dictation")
     mode.enable("command")
 	
-	user.regSec() 
+	user.unRegSwitchCommand()
+	user.regSec()
 	user.turnOnMouseControl()
+	
+^talon sleep$:
+    mode.disable("dictation")
+    mode.disable("command")
+    mode.enable("sleep")
+
+	user.unRegSec()
+	user.turnOffMouseControl()
 	user.unRegSwitchCommand()
