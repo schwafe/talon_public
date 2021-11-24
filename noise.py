@@ -80,12 +80,12 @@ class MouseActions:
         global threshold_passed
         
         if is_active:
-            print('hiss start')
+            print('secondary true')
             start = time()
             running = True
             cron.after(noise_length_threshold, MouseActions.still_running)
         else:
-            print('hiss stop')
+            print('secondary false')
             running = False
             if threshold_passed:
                 threshold_passed = False
@@ -166,10 +166,13 @@ class MouseActions:
             actions.mode.disable("sleep")
             actions.mode.disable("dictation")
             actions.mode.enable("command")
+            #temporary fix for accidently registering multiple times
+            actions.user.unRegPrim()
+            actions.user.unRegAlt()
             
             actions.user.turnOnMouseControl()
-            actions.user.regPrim()
             actions.user.unRegSec()
+            actions.user.regPrim()
             actions.user.regAlt()
             #unregistering the method while still in it, seems to be a problem
             cron.after(noise_length_threshold, MouseActions.unRegSwitchCommand) 
