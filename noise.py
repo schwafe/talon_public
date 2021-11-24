@@ -80,12 +80,12 @@ class MouseActions:
         global threshold_passed
         
         if is_active:
-            print('secondary true')
+            print('hiss start')
             start = time()
             running = True
             cron.after(noise_length_threshold, MouseActions.still_running)
         else:
-            print('secondary false')
+            print('hiss stop')
             running = False
             if threshold_passed:
                 threshold_passed = False
