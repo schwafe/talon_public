@@ -29,7 +29,6 @@ mod = Module()
 mod.list(
     "mouse_button", desc="List of mouse button words to mouse_click index parameter"
 )
-
 setting_mouse_continuous_scroll_amount = mod.setting(
     "mouse_continuous_scroll_amount",
     type=int,
@@ -47,6 +46,12 @@ setting_mouse_wheel_horizontal_amount = mod.setting(
     type=int,
     default=40,
     desc="The amount to scroll left/right",
+)
+setting_mouse_click_duration = mod.setting(
+    "mouse_click_duration",
+    type=float,
+    default=16000,
+    desc="The default duration of a click.",
 )
 
 continuous_scoll_mode = ""
@@ -73,11 +78,14 @@ class MouseActions:
         global start
         global running
         global threshold_passed
+        
         if is_active:
+            print('secondary true')
             start = time()
             running = True
             cron.after(noise_length_threshold, MouseActions.still_running)
         else:
+            print('secondary false')
             running = False
             if threshold_passed:
                 threshold_passed = False
@@ -94,11 +102,11 @@ class MouseActions:
                     
     def leftClick(arg: int):
         """This does a simple left click."""
-        ctrl.mouse_click(button=0, hold=16000)
+        ctrl.mouse_click(button=0, hold=setting_mouse_click_duration.get())
           
     def rightClick(arg: int):
         """This does a simple right click."""
-        ctrl.mouse_click(button=1, hold=16000)
+        ctrl.mouse_click(button=1, hold=setting_mouse_click_duration.get())
         
     def mouse_drag(button: int):
         """Press and hold/release a specific mouse button for dragging"""
@@ -161,6 +169,7 @@ class MouseActions:
             
             actions.user.turnOnMouseControl()
             actions.user.regPrim()
+            actions.user.unRegSec()
             actions.user.regAlt()
             #unregistering the method while still in it, seems to be a problem
             cron.after(noise_length_threshold, MouseActions.unRegSwitchCommand) 
