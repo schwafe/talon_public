@@ -1,5 +1,4 @@
 from talon import speech_system, Context
-from talon.engines.w2l import WebW2lEngine, W2lEngine
 from talon.engines.webspeech import WebSpeechEngine
 
 webspeech = WebSpeechEngine()
