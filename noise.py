@@ -15,14 +15,10 @@ from talon import (
 from talon_plugins import eye_mouse, eye_zoom_mouse
 from talon_plugins.eye_mouse import config, toggle_camera_overlay, toggle_control
 
-key = actions.key
-self = actions.self
 scroll_amount = 0
 click_job = None
 scroll_job = None
 gaze_job = None
-cancel_scroll_on_pop = True
-control_mouse_forced = False
 
 
 mod = Module()
@@ -60,6 +56,7 @@ start = 0
 running = False
 noise_length_threshold = "150ms"
 threshold_passed = False
+secondary_mode = False
 
 @mod.action_class
 class MouseActions:
@@ -67,10 +64,12 @@ class MouseActions:
         """If the hiss is still going, a drag motion is started"""
         global running
         global threshold_passed
+        global secondary_mode
         if running:
             threshold_passed = True
-            #if controlling the mouse is enabled a drag motion is started
-            if(config.control_mouse):
+            if(secondary_mode):
+                MouseActions.mouse_drag(1)
+            else:
                 MouseActions.mouse_drag(0)
  
     def mouse_secondary_mode(is_active: int):
@@ -78,27 +77,41 @@ class MouseActions:
         global start
         global running
         global threshold_passed
+        global secondary_mode
         
         if is_active:
-            print('secondary true')
+            print('hiss start')
             start = time()
             running = True
+            if not config.control_mouse:
+                #start dragging with right click
+                toggle_control(not config.control_mouse)
             cron.after(noise_length_threshold, MouseActions.still_running)
         else:
-            print('secondary false')
+            print('hiss stop')
             running = False
             if threshold_passed:
                 threshold_passed = False
                 MouseActions.mouse_drag_end()
+                if secondary_mode and config.control_mouse:
+                    toggle_control(not config.control_mouse)
             else:
-                print('toggle secondary')
-                toggle_control(not config.control_mouse)
-                if(not config.control_mouse):
+                if secondary_mode:
+                    #switch into primary mode
+                    print('exit secondary')
+                    if not config.control_mouse:
+                        toggle_control(not config.control_mouse)
+                    MouseActions.unRegSec()
+                    MouseActions.regPrim()  
+                    secondary_mode = False
+                else:
+                    #switch into secondary mode
+                    print('enter secondary')
+                    if config.control_mouse:
+                        toggle_control(not config.control_mouse)
                     MouseActions.unRegPrim()
                     MouseActions.regSec()
-                else:
-                    MouseActions.unRegSec()
-                    MouseActions.regPrim()
+                    secondary_mode = True
                     
     def leftClick(arg: int):
         """This does a simple left click."""
