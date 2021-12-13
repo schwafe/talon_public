@@ -68,9 +68,9 @@ class MouseActions:
         if running:
             threshold_passed = True
             if(secondary_mode):
-                MouseActions.mouse_drag(1)
+                actions.user.mouse_drag(1)
             else:
-                MouseActions.mouse_drag(0)
+                actions.user.mouse_drag(0)
  
     def mouse_secondary_mode(is_active: int):
         """This mode is used for stopping the mouse and right clicking."""
@@ -86,13 +86,13 @@ class MouseActions:
             if not config.control_mouse:
                 #start dragging with right click
                 toggle_control(not config.control_mouse)
-            cron.after(noise_length_threshold, MouseActions.still_running)
+            cron.after(noise_length_threshold, actions.user.still_running)
         else:
             print('hiss stop')
             running = False
             if threshold_passed:
                 threshold_passed = False
-                MouseActions.mouse_drag_end()
+                actions.user.mouse_drag_end()
                 if secondary_mode and config.control_mouse:
                     toggle_control(not config.control_mouse)
             else:
@@ -101,16 +101,16 @@ class MouseActions:
                     print('exit secondary')
                     if not config.control_mouse:
                         toggle_control(not config.control_mouse)
-                    MouseActions.unRegSec()
-                    MouseActions.regPrim()  
+                    actions.user.unRegSec()
+                    actions.user.regPrim()  
                     secondary_mode = False
                 else:
                     #switch into secondary mode
                     print('enter secondary')
                     if config.control_mouse:
                         toggle_control(not config.control_mouse)
-                    MouseActions.unRegPrim()
-                    MouseActions.regSec()
+                    actions.user.unRegPrim()
+                    actions.user.regSec()
                     secondary_mode = True
                     
     def leftClick(arg: int):
@@ -124,7 +124,7 @@ class MouseActions:
     def mouse_drag(button: int):
         """Press and hold/release a specific mouse button for dragging"""
         # Clear any existing drags
-        MouseActions.mouse_drag_end()
+        actions.user.mouse_drag_end()
 
         # Start drag
         ctrl.mouse_click(button=button, down=True)
@@ -136,34 +136,34 @@ class MouseActions:
             ctrl.mouse_click(button=button, up=True)
       
     def regPrim():
-        """This allows hissing to switch into the secondary mode."""
+        """This enables popping for left clicks."""
         print('register 1')
-        noise.register('pop', MouseActions.leftClick)
+        noise.register('pop', actions.user.leftClick)
         
     def unRegPrim():
-        """This disables the switching of modes when hissing."""
+        """This disables popping for left clicks."""
         print('unregister 1')  
-        noise.unregister('pop', MouseActions.leftClick)  
+        noise.unregister('pop', actions.user.leftClick)  
         
     def regSec():
-        """This allows hissing to switch into the secondary mode."""
+        """This enables popping for right clicks."""
         print('register 2')
-        noise.register('pop', MouseActions.rightClick)
+        noise.register('pop', actions.user.rightClick)
         
     def unRegSec():
-        """This disables the switching of modes when hissing."""
+        """This disables popping for right clicks."""
         print('unregister 2')
-        noise.unregister('pop', MouseActions.rightClick)
+        noise.unregister('pop', actions.user.rightClick)
         
     def regAlt():
         """This allows hissing to switch into the alternative mode."""
         print('register a')
-        noise.register('hiss', MouseActions.mouse_secondary_mode)
+        noise.register('hiss', actions.user.mouse_secondary_mode)
         
     def unRegAlt():
         """This disallows hissing to switch into the alternative mode."""
         print('unregister a')
-        noise.unregister('hiss', MouseActions.mouse_secondary_mode)
+        noise.unregister('hiss', actions.user.mouse_secondary_mode)
         
     def turnOnMouseControl():
         """This enables controlling the mouse."""
@@ -187,19 +187,19 @@ class MouseActions:
             actions.user.unRegSec()
             actions.user.regPrim()
             actions.user.regAlt()
-            #unregistering the method while still in it, seems to be a problem
-            cron.after(noise_length_threshold, MouseActions.unRegSwitchCommand) 
+            #unregistering the method while still in it does not work
+            cron.after(noise_length_threshold, actions.user.unRegSwitchCommand) 
             
         
     def regSwitchCommand():
         """This allows hissing to switch from dictation mode to command mode."""
         print('register b') 
-        noise.register('pop', MouseActions.enter_command_mode)
+        noise.register('pop', actions.user.enter_command_mode)
         
     def unRegSwitchCommand():
         """This disables hissing to switch from dictation mode to command mode."""
         print('unregister b')
-        noise.unregister('pop', MouseActions.enter_command_mode)
+        noise.unregister('pop', actions.user.enter_command_mode)
         
     def mouse_calibrate():
         """Start calibration"""
