@@ -16,15 +16,11 @@ from talon_plugins import eye_mouse, eye_zoom_mouse
 from talon_plugins.eye_mouse import config, toggle_camera_overlay, toggle_control
 
 scroll_amount = 0
-click_job = None
 scroll_job = None
 gaze_job = None
 
 
 mod = Module()
-mod.list(
-    "mouse_button", desc="List of mouse button words to mouse_click index parameter"
-)
 setting_mouse_continuous_scroll_amount = mod.setting(
     "mouse_continuous_scroll_amount",
     type=int,
@@ -49,77 +45,21 @@ setting_mouse_click_duration = mod.setting(
     default=16000,
     desc="The default duration of a click.",
 )
+setting_hiss_threshold = mod.setting(
+    "hiss_threshold",
+    type=str,
+    default="150ms",
+    desc="Threshold for a hiss to count as long.",
+)
 
 continuous_scoll_mode = ""
-
-start = 0
+#0 = inactive, 1 = left click, 2 = right click, 3 = exit dictation mode and enter command mode
+modus_operandi = 0
 running = False
-noise_length_threshold = "150ms"
 threshold_passed = False
-secondary_mode = False
 
 @mod.action_class
-class MouseActions:
-    def still_running():
-        """If the hiss is still going, a drag motion is started"""
-        global running
-        global threshold_passed
-        global secondary_mode
-        if running:
-            threshold_passed = True
-            if(secondary_mode):
-                actions.user.mouse_drag(1)
-            else:
-                actions.user.mouse_drag(0)
- 
-    def mouse_secondary_mode(is_active: int):
-        """This mode is used for stopping the mouse and right clicking."""
-        global start
-        global running
-        global threshold_passed
-        global secondary_mode
-        
-        if is_active:
-            print('hiss start')
-            start = time()
-            running = True
-            if not config.control_mouse:
-                #start dragging with right click
-                toggle_control(not config.control_mouse)
-            cron.after(noise_length_threshold, actions.user.still_running)
-        else:
-            print('hiss stop')
-            running = False
-            if threshold_passed:
-                threshold_passed = False
-                actions.user.mouse_drag_end()
-                if secondary_mode and config.control_mouse:
-                    toggle_control(not config.control_mouse)
-            else:
-                if secondary_mode:
-                    #switch into primary mode
-                    print('exit secondary')
-                    if not config.control_mouse:
-                        toggle_control(not config.control_mouse)
-                    actions.user.unRegSec()
-                    actions.user.regPrim()  
-                    secondary_mode = False
-                else:
-                    #switch into secondary mode
-                    print('enter secondary')
-                    if config.control_mouse:
-                        toggle_control(not config.control_mouse)
-                    actions.user.unRegPrim()
-                    actions.user.regSec()
-                    secondary_mode = True
-                    
-    def leftClick(arg: int):
-        """This does a simple left click."""
-        ctrl.mouse_click(button=0, hold=setting_mouse_click_duration.get())
-          
-    def rightClick(arg: int):
-        """This does a simple right click."""
-        ctrl.mouse_click(button=1, hold=setting_mouse_click_duration.get())
+class Actions:
         
     def mouse_drag(button: int):
         """Press and hold/release a specific mouse button for dragging"""
@@ -134,37 +74,7 @@ class MouseActions:
         buttons_held_down = list(ctrl.mouse_buttons_down())
         for button in buttons_held_down:
             ctrl.mouse_click(button=button, up=True)
-      
-    def regPrim():
-        """This enables popping for left clicks."""
-        print('register 1')
-        noise.register('pop', actions.user.leftClick)
-        
-    def unRegPrim():
-        """This disables popping for left clicks."""
-        print('unregister 1')  
-        noise.unregister('pop', actions.user.leftClick)  
-        
-    def regSec():
-        """This enables popping for right clicks."""
-        print('register 2')
-        noise.register('pop', actions.user.rightClick)
-        
-    def unRegSec():
-        """This disables popping for right clicks."""
-        print('unregister 2')
-        noise.unregister('pop', actions.user.rightClick)
-        
-    def regAlt():
-        """This allows hissing to switch into the alternative mode."""
-        print('register a')
-        noise.register('hiss', actions.user.mouse_secondary_mode)
-        
-    def unRegAlt():
-        """This disallows hissing to switch into the alternative mode."""
-        print('unregister a')
-        noise.unregister('hiss', actions.user.mouse_secondary_mode)
-        
+            
     def turnOnMouseControl():
         """This enables controlling the mouse."""
         toggle_control(True)
@@ -172,35 +82,7 @@ class MouseActions:
     def turnOffMouseControl():
         """This disables controlling the mouse."""
         toggle_control(False)
-        
-    def enter_command_mode(is_active: int):
-        """This switches from dictation mode to command mode."""
-        if not is_active:
-            actions.mode.disable("sleep")
-            actions.mode.disable("dictation")
-            actions.mode.enable("command")
-            #temporary fix for accidently registering multiple times
-            actions.user.unRegPrim()
-            actions.user.unRegAlt()
-            
-            actions.user.turnOnMouseControl()
-            actions.user.unRegSec()
-            actions.user.regPrim()
-            actions.user.regAlt()
-            #unregistering the method while still in it does not work
-            cron.after(noise_length_threshold, actions.user.unRegSwitchCommand) 
-            
-        
-    def regSwitchCommand():
-        """This allows hissing to switch from dictation mode to command mode."""
-        print('register b') 
-        noise.register('pop', actions.user.enter_command_mode)
-        
-    def unRegSwitchCommand():
-        """This disables hissing to switch from dictation mode to command mode."""
-        print('unregister b')
-        noise.unregister('pop', actions.user.enter_command_mode)
-        
+                        
     def mouse_calibrate():
         """Start calibration"""
         eye_mouse.calib_start()
@@ -249,8 +131,87 @@ class MouseActions:
         continuous_scoll_mode = "gaze scroll"
 
         start_cursor_scrolling()
+        
+    def enter_command_mode():
+        """Enters command mode and sets modus_operandi and mouse control"""
+        global modus_operandi
+        print('modus_operandi 1')
+        modus_operandi = 1
+        actions.mode.disable("sleep")
+        actions.mode.disable("dictation")
+        actions.mode.enable("command")
+        actions.user.turnOnMouseControl()
+        
+    def enter_dictation_mode():
+        """Enters dictation mode and sets modus_operandi and mouse control"""
+        global modus_operandi
+        print('modus_operandi 3')
+        modus_operandi = 3
+        actions.mode.disable("sleep")
+        actions.mode.disable("command")
+        actions.mode.enable("dictation")
+        actions.user.turnOffMouseControl()
 
 
+def still_running():
+    """If the hiss is still going, a drag motion is started"""
+    global threshold_passed
+    if running:
+        threshold_passed = True
+        if modus_operandi == 1:
+            #start left drag
+            actions.user.mouse_drag(0)
+        elif modus_operandi == 2:
+            #start right drag
+            #toggle_control(not config.control_mouse)
+            actions.user.mouse_drag(1)
+                
+ 
+def onHiss(active: int):
+    """This handles the hiss sound."""
+    global modus_operandi, running, threshold_passed
+    if modus_operandi != 3:
+        if active:
+            print('hiss start')
+            #wait and see if it's a long hiss
+            if not running:
+                running = True
+                cron.after(setting_hiss_threshold.get(), still_running)
+            else:
+                print('prevented double hiss!')
+        elif threshold_passed:
+            print('drag end')
+            #drag end
+            actions.user.mouse_drag_end()
+            #if modus_operandi == 2:
+                #stop dragging with right click
+                #toggle_control(not config.control_mouse)
+            threshold_passed = False
+            running = False
+        else:
+            #short hiss
+            print('hiss end')
+            toggle_control(not config.control_mouse)
+            if modus_operandi == 0 or modus_operandi == 2:
+                print('modus_operandi 1')
+                modus_operandi = 1
+            elif modus_operandi == 1:
+                print('modus_operandi 2')
+                modus_operandi = 2
+            running = False
+                
+noise.register('hiss', lambda active: onHiss(active))
+                    
+def onPop(active: int):
+    """This handles the pop sound."""
+    if modus_operandi == 1:
+        ctrl.mouse_click(button=0, hold=setting_mouse_click_duration.get())
+    elif modus_operandi == 2:
+        ctrl.mouse_click(button=1, hold=setting_mouse_click_duration.get())
+    elif modus_operandi == 3:
+        actions.user.enter_command_mode()
+
+noise.register('pop', lambda active: onPop(active))
 
 def mouse_scroll(amount):
     def scroll():

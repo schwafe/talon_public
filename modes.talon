@@ -1,18 +1,10 @@
 not mode: sleep
 -
 ^dictation mode$:
-    mode.disable("sleep")
-    mode.disable("command")
-    mode.enable("dictation")
-    user.code_clear_language_mode()
-	
-	user.unRegAlt()
-	user.unRegPrim()
-	user.turnOffMouseControl()
-	user.regSwitchCommand()
+    user.enter_dictation_mode()
 	
 ^command mode$:
-	user.enter_command_mode(0)
+	user.enter_command_mode()
 	
 ^talon sleep$:
     mode.disable("dictation")
