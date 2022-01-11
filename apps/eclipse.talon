@@ -9,7 +9,7 @@ follow include:
 complete:
  key(ctrl-space)
  
-find it:
+find it|search:
  key(ctrl-f)
  
 resume:
@@ -24,11 +24,32 @@ step over:
 step return: 
  key(f7)
 
-terminate:
+application stop:
  key(ctrl-f2)
  
-toggle breakpoint:
+breakpoint toggle:
  key(ctrl-shift-b)
  
 tab close:
  key(ctrl-w)
+ 
+comment:
+ key(ctrl-7)
+ 
+references:
+ key(ctrl-shift-g)
+ 
+block mode:
+ key(alt-shift-a)
+ 
+system explorer:
+ key(ctrl-shift-alt-w)
+ 
+project build:
+ key(ctrl-shift-alt-v)
+ 
+launch:
+ key(ctrl-shift-alt-a)
+ 
+go back:
+ key(ctrl-shift-alt-b)
