@@ -24,8 +24,11 @@ step over:
 step return: 
  key(f7)
 
-application stop:
+terminate:
  key(ctrl-f2)
+ 
+suspend:
+ key(ctrl-shift-alt-s)
  
 breakpoint toggle:
  key(ctrl-shift-b)
@@ -48,8 +51,18 @@ system explorer:
 project build:
  key(ctrl-shift-alt-v)
  
-launch:
+project launch:
  key(ctrl-shift-alt-a)
+ 
+project debug:
+ key(f11)
  
 go back:
  key(ctrl-shift-alt-b)
+ 
+#signs
+equals:
+ insert(" = ")
+ 
+does not equal:
+ insert(" != ")
