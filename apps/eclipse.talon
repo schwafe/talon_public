@@ -60,6 +60,16 @@ project debug:
 go back:
  key(ctrl-shift-alt-b)
  
+next match:
+ key(ctrl-.)
+ 
+previous match:
+ key(ctrl-,)
+ 
+line complete:
+ key(end)
+ insert(';')
+ 
 #signs
 equals:
  insert(" = ")
