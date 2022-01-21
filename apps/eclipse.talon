@@ -1,4 +1,6 @@
 app: stm32cubeide.exe
+app: eclipse.exe
+app: fitdp.exe
 -
 open declaration:
  key(f3)
@@ -44,22 +46,24 @@ references:
  
 block mode:
  key(alt-shift-a)
- 
-system explorer:
- key(ctrl-shift-alt-w)
- 
-project build:
- key(ctrl-shift-alt-v)
+
  
 project launch:
- key(ctrl-shift-alt-a)
+ key(ctrl-f11)
  
 project debug:
  key(f11)
  
-go back:
- key(ctrl-shift-alt-b)
+matching brace:
+ key(ctrl-shift-p)
  
+#signs
+equals:
+ insert(" = ")
+ 
+does not equal:
+ insert(" != ")
+  
 next match:
  key(ctrl-.)
  
@@ -70,9 +74,17 @@ line complete:
  key(end)
  insert(';')
  
-#signs
-equals:
- insert(" = ")
+####################
+#custom keybinds
  
-does not equal:
- insert(" != ")
+system explorer:
+ key(ctrl-shift-alt-w)
+ 
+project build:
+ key(ctrl-shift-alt-v)
+ 
+project build clean:
+ key(ctrl-shift-alt-c)
+ 
+
+ #key(ctrl-shift-alt-q)
