@@ -7,8 +7,11 @@ database:
  insert("h.d.f")
  key(enter)
  
-new tab:
+tab open:
  key(f2)
+ 
+tab switch:
+ key(f9)
  
 debug tools:
  insert("tso aetools")
@@ -30,6 +33,9 @@ display local:
 display imports:
  insert("dis i ")
  key(enter)
+ 
+search:
+ key(f6)
  
 up:
  key(f7)
