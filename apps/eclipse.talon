@@ -11,6 +11,12 @@ follow include:
 complete:
  key(ctrl-space)
  
+quick fix:
+ key(ctrl-1) 
+ 
+rename:
+ key(shift-alt-r)
+ 
 find it|search:
  key(ctrl-f)
  
@@ -29,9 +35,6 @@ step return:
 terminate:
  key(ctrl-f2)
  
-suspend:
- key(ctrl-shift-alt-s)
- 
 breakpoint toggle:
  key(ctrl-shift-b)
  
@@ -47,7 +50,6 @@ references:
 block mode:
  key(alt-shift-a)
 
- 
 project launch:
  key(ctrl-f11)
  
@@ -56,13 +58,6 @@ project debug:
  
 matching brace:
  key(ctrl-shift-p)
- 
-#signs
-equals:
- insert(" = ")
- 
-does not equal:
- insert(" != ")
   
 next match:
  key(ctrl-.)
@@ -74,7 +69,30 @@ line complete:
  key(end)
  insert(';')
  
-####################
+fix indentation:
+ key(ctrl-shift-f)
+ 
+#############################
+#Java
+assign:
+ insert(" = ")
+ 
+equals:
+ insert(" == ")
+
+does not equal:
+ insert(" != ")
+ 
+is greater than:
+ insert(" > ")
+ 
+is lesser than:
+ insert(" < ")
+ 
+logger token:
+ insert("{}")
+
+#############################
 #custom keybinds
  
 system explorer:
@@ -86,5 +104,7 @@ project build:
 project build clean:
  key(ctrl-shift-alt-c)
  
+suspend:
+ key(ctrl-shift-alt-s)
 
  #key(ctrl-shift-alt-q)
