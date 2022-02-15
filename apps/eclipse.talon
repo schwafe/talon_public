@@ -12,7 +12,13 @@ complete:
  key(ctrl-space)
  
 quick fix:
- key(ctrl-1) 
+ key(ctrl-1)
+ 
+quick outline:
+ key(ctrl-o) 
+ 
+quick type hierarchy:
+ key(ctrl-t)
  
 rename:
  key(shift-alt-r)
