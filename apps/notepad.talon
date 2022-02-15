@@ -24,5 +24,5 @@ compare close right:
  key(ctrl-shift-tab)
  key(ctrl-w:2)
 
-tap open: 
+tap (open | new): 
  key(ctrl-n)
