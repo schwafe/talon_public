@@ -80,7 +80,11 @@ fix indentation:
  
 #############################
 #Java
-assign:
+
+new:
+ insert("new ")
+ 
+(assign|set):
  insert(" = ")
  
 equals:
@@ -97,6 +101,49 @@ is lesser than:
  
 logger token:
  insert("{}")
+ 
+todo:
+ insert("TODO ")
+ 
+string:
+ insert("String ")
+ 
+boolean:
+ insert("boolean ")
+ 
+true:
+ insert("true;")
+ 
+false:
+ insert("false;")
+ 
+private:
+ insert("private ")
+ 
+public:
+ insert("public ")
+ 
+static:
+ insert("static ")
+ 
+void:
+ insert("void ")
+ 
+if:
+ insert("if (")
+ 
+return:
+ insert("return ")
+ 
+break:
+ insert("break;")
+ 
+throw new:
+ insert("throw new ")
+ 
+javadoc:
+ insert("/**")
+ key(enter)
 
 #############################
 #custom keybinds
