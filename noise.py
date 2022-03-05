@@ -131,11 +131,20 @@ class Actions:
         continuous_scoll_mode = "gaze scroll"
 
         start_cursor_scrolling()
+
+    def mouse_gaze_scroll_toggle():
+        """Starts gaze scroll"""
+        global continuous_scoll_mode
+        continuous_scoll_mode = "gaze scroll"
+        if scroll_job is None and gaze_job is None :
+            start_cursor_scrolling()
+        else:
+            stop_scroll()
         
     def enter_command_mode():
         """Enters command mode and sets modus_operandi and mouse control"""
         global modus_operandi
-        print('modus_operandi 1')
+        #print('modus_operandi 1')
         modus_operandi = 1
         actions.mode.disable("sleep")
         actions.mode.disable("dictation")
@@ -145,7 +154,7 @@ class Actions:
     def enter_dictation_mode():
         """Enters dictation mode and sets modus_operandi and mouse control"""
         global modus_operandi
-        print('modus_operandi 3')
+        #print('modus_operandi 3')
         modus_operandi = 3
         actions.mode.disable("sleep")
         actions.mode.disable("command")
@@ -172,7 +181,7 @@ def onHiss(active: int):
     global modus_operandi, running, threshold_passed
     if modus_operandi != 3:
         if active:
-            print('hiss start')
+            #print('hiss start')
             #wait and see if it's a long hiss
             if not running:
                 running = True
@@ -180,7 +189,7 @@ def onHiss(active: int):
             else:
                 print('prevented double hiss!')
         elif threshold_passed:
-            print('drag end')
+            #print('drag end')
             #drag end
             actions.user.mouse_drag_end()
             #if modus_operandi == 2:
@@ -190,13 +199,13 @@ def onHiss(active: int):
             running = False
         else:
             #short hiss
-            print('hiss end')
+           # print('hiss end')
             toggle_control(not config.control_mouse)
             if modus_operandi == 0 or modus_operandi == 2:
-                print('modus_operandi 1')
+                #print('modus_operandi 1')
                 modus_operandi = 1
             elif modus_operandi == 1:
-                print('modus_operandi 2')
+                #print('modus_operandi 2')
                 modus_operandi = 2
             running = False
                 

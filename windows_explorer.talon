@@ -15,3 +15,6 @@ notepad compare:
  key(ctrl-alt-1)
  key(ctrl-tab)
  key(ctrl-alt-c)
+ 
+show context menu:
+ key(ctrl-shift-f10)
