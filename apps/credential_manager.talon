@@ -1,5 +1,5 @@
 app: Credential Manager UI Host
 -
 
-parrot(palate_click):
+parrot(posterior_click):
  key(enter)
