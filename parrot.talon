@@ -1,79 +1,23 @@
+mode: user.parrot
+-
 parrot(cluck):
 	print("cluck")
+	
+parrot(closed-mouth cluck):
+	print("closed-mouth cluck")
+	
+parrot(frontal_click):
+	print("frontal_click") 
 
-parrot(tut):
-	print("tut")
-
-parrot(palate_click):
+parrot(posterior_click):
 	user.mouse_gaze_scroll_toggle()
 
 
-
-parrot(gluck):
-	print("gluck")
-
-parrot(finger_snap):
-	print("finger_snap")
-
-parrot(ch):
-	print("ch")
-
-parrot(ah):
-	print("ah")
-
-parrot(oh):
-	print("oh")
-
-parrot(ee):
-	print("ee")
-
-parrot(ue):
-	print("ue")
-
-parrot(ae):
-	print("ae")
-
-parrot(horse):
-	print("horse")
-
-parrot(whistle):
-	print("whistle")
-
-parrot(chopper):
-	print("chopper")
-
-parrot(hurr):
-	print("hurr")
-
-parrot(hmm):
-	print("hmm")
-
-parrot(oo):
-	print("oo")
-
-parrot(lll):
-	print("lll")
-
-parrot(yee):
-	print("yee")
-
-parrot(uh):
-	print("uh")
-
-parrot(fff):
-	print("fff")
-
-parrot(buzz):
-	print("buzz")
-
-parrot(generator):
-	print("generator")
-
+parrot(low_whistle):
+	print("low_whistle")
+	
 parrot(hiss):
 	print("hiss")
 
-parrot(shush):
-	print("shush")
-
-parrot(x):
-	print("x")
+parrot(pop):
+	print("pop")
