@@ -1,5 +1,10 @@
 not mode: sleep
 -
+^parrot mode$:
+	print("enabling parrot mode")
+	mode.enable("user.parrot")
+	user.show_parrot_on_button()
+
 ^dictation mode$:
     user.enter_dictation_mode()
 	

@@ -10,7 +10,8 @@ parrot(frontal_click):
 	print("frontal_click") 
 
 parrot(posterior_click):
-	user.mouse_gaze_scroll_toggle()
+	print("posterior_click")
+	user.mouse_toggle_gaze_scroll()
 
 
 parrot(low_whistle):
