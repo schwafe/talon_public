@@ -80,6 +80,10 @@ fix indentation:
  
 #############################
 #Java
+open:
+ key(end)
+ insert('{')
+ key(enter)
 
 new:
  insert("new ")
@@ -116,6 +120,15 @@ true:
  
 false:
  insert("false;")
+  
+and:
+ insert("&& ") 
+  
+or:
+ insert("|| ") 
+
+null:
+ insert("null ")
  
 private:
  insert("private ")
@@ -126,11 +139,21 @@ public:
 static:
  insert("static ")
  
+final:
+ insert("final ")
+ 
 void:
  insert("void ")
  
 if:
- insert("if (")
+ insert("if(")
+ 
+for: 
+ insert("for(")
+ 
+else:
+ insert("else {")
+ key(enter)
  
 return:
  insert("return ")
@@ -160,4 +183,7 @@ project build clean:
 suspend:
  key(ctrl-shift-alt-s)
 
- #key(ctrl-shift-alt-q)
+#############################
+
+parrot(low_whistle):
+ key(ctrl-space)
