@@ -29,3 +29,8 @@ class Actions:
         """Shows the parrot mode OFF button"""
         button_exit_parrot_mode.hide()
         button_enter_parrot_mode.show()
+        
+    def hide_parrot_buttons():
+        """Hides the parrot mode button"""
+        button_exit_parrot_mode.hide()
+        button_enter_parrot_mode.hide()

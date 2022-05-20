@@ -3,8 +3,12 @@ app: PCSWS.EXE
 go back:
  key(f3)
  
-database:
- insert("h.d.f")
+browse database:
+ insert("h.d.f;1")
+ key(enter)
+ 
+edit database:
+ insert("h.d.f;2")
  key(enter)
  
 tab open:
