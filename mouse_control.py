@@ -83,11 +83,11 @@ def still_running():
         threshold_passed = True
         if modus_operandi == 1:
             #start left drag
-            print('left drag')
+            #print('left drag')
             actions.user.mouse_drag(0)
         elif modus_operandi == 2:
             #start right drag
-            print('right drag')
+            #print('right drag')
             #toggle_control(not config.control_mouse)
             actions.user.mouse_drag(1)
                 
@@ -97,7 +97,7 @@ def onHiss(active: int):
     global modus_operandi, running, threshold_passed
     if modus_operandi != 3:
         if active:
-            print('hiss start')
+            #print('hiss start')
             #wait and see if it's a long hiss
             if not running:
                 running = True
@@ -107,7 +107,7 @@ def onHiss(active: int):
         elif threshold_passed:
             threshold_passed = False
             running = False
-            print('drag end')
+            #print('drag end')
             #drag end
             actions.user.mouse_drag_end()
             #if modus_operandi == 2:
@@ -116,13 +116,13 @@ def onHiss(active: int):
         else:
             running = False
             #short hiss
-            print('hiss end')
+            #print('hiss end')
             toggle_control(not config.control_mouse)
             if modus_operandi == 0 or modus_operandi == 2:
-                print('modus_operandi 1')
+                #print('modus_operandi 1')
                 modus_operandi = 1
             elif modus_operandi == 1:
-                print('modus_operandi 2')
+                #print('modus_operandi 2')
                 modus_operandi = 2
                 
 noise.register('hiss', lambda active: onHiss(active))
