@@ -13,7 +13,9 @@ from talon import (
     ui,
 )
 from talon_plugins import eye_mouse, eye_zoom_mouse
-from talon_plugins.eye_mouse import config, toggle_camera_overlay, toggle_control
+from talon_plugins.eye_mouse import config, toggle_camera_overlay
+
+tracking = actions.tracking
 
 scroll_amount = 0
 scroll_job = None
@@ -69,11 +71,13 @@ class Actions:
             
     def turnOnMouseControl():
         """This enables controlling the mouse."""
-        toggle_control(True)
+        tracking.control_toggle(True)
+        #deprecated toggle_control(True)
         
     def turnOffMouseControl():
         """This disables controlling the mouse."""
-        toggle_control(False)
+        tracking.control_toggle(False)
+        #deprecated toggle_control(False)
 
 
 def still_running():
@@ -116,8 +120,9 @@ def onHiss(active: int):
         else:
             running = False
             #short hiss
-            #print('hiss end')
-            toggle_control(not config.control_mouse)
+            print('hiss end')
+            tracking.control_toggle()
+            #deprecated toggle_control(not config.control_mouse)
             if modus_operandi == 0 or modus_operandi == 2:
                 #print('modus_operandi 1')
                 modus_operandi = 1
