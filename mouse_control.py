@@ -17,10 +17,6 @@ from talon_plugins.eye_mouse import config, toggle_camera_overlay
 
 tracking = actions.tracking
 
-scroll_amount = 0
-scroll_job = None
-gaze_job = None
-
 
 mod = Module()
 setting_mouse_click_duration = mod.setting(
@@ -36,7 +32,6 @@ setting_hiss_threshold = mod.setting(
     desc="Threshold for a hiss to count as long.",
 )
 
-continuous_scoll_mode = ""
 #0 = inactive, 1 = left click, 2 = right click, 3 = exit dictation mode and enter command mode
 modus_operandi = 0
 running = False
@@ -120,7 +115,7 @@ def onHiss(active: int):
         else:
             running = False
             #short hiss
-            print('hiss end')
+            #print('hiss end')
             tracking.control_toggle()
             #deprecated toggle_control(not config.control_mouse)
             if modus_operandi == 0 or modus_operandi == 2:
