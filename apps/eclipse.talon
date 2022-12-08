@@ -2,6 +2,9 @@ app: stm32cubeide.exe
 app: eclipse.exe
 app: fitdp.exe
 -
+#enable java stuff
+tag(): user.java
+
 open declaration:
  key(f3)
  
@@ -78,95 +81,6 @@ line complete:
 fix indentation:
  key(ctrl-shift-f)
  
-#############################
-#Java
-open:
- key(end)
- insert('{')
- key(enter)
-
-new:
- insert("new ")
- 
-(assign|set):
- insert(" = ")
- 
-equals:
- insert(" == ")
-
-does not equal:
- insert(" != ")
- 
-is greater than:
- insert(" > ")
- 
-is lesser than:
- insert(" < ")
- 
-logger token:
- insert("{}")
- 
-todo:
- insert("TODO ")
- 
-string:
- insert("String ")
- 
-boolean:
- insert("boolean ")
- 
-true:
- insert("true;")
- 
-false:
- insert("false;")
-  
-and:
- insert("&& ") 
-  
-or:
- insert("|| ") 
-
-null:
- insert("null ")
- 
-private:
- insert("private ")
- 
-public:
- insert("public ")
- 
-static:
- insert("static ")
- 
-final:
- insert("final ")
- 
-void:
- insert("void ")
- 
-if:
- insert("if(")
- 
-for: 
- insert("for(")
- 
-else:
- insert("else {")
- key(enter)
- 
-return:
- insert("return ")
- 
-break:
- insert("break;")
- 
-throw new:
- insert("throw new ")
- 
-javadoc:
- insert("/**")
- key(enter)
 
 #############################
 #custom keybinds

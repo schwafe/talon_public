@@ -1,4 +1,3 @@
-app: Windows Explorer
--
-show context menu:
- key(ctrl-shift-f10)
+indi|indicators:
+ insert("<>")
+ key(left)

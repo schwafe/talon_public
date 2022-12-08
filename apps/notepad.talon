@@ -1,6 +1,7 @@
-app: Notepad++ : a free (GPL) source code editor
+app.exe: notepad++.exe
 -
-find it: key(ctrl-f)
+find it:
+ key(ctrl-f)
 
 compare left:
  key(ctrl-alt-1)
