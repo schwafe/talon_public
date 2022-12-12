@@ -1,7 +1,6 @@
 extend parens:
- user.extend('PARENS','BOTH')
+    user.extend('PARENS','BOTH')
 extend paren left:
- user.extend('PARENS','LEFT')
+    user.extend('PARENS','LEFT')
 extend paren right:
- user.extend('PARENS','RIGHT')
- 
+    user.extend('PARENS','RIGHT')

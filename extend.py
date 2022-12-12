@@ -8,7 +8,7 @@ ctx = Context()
 text_navigation_max_line_search = mod.setting(
     "text_navigation_max_line_search",
     type=int,
-    default=10,
+    default=2,
     desc="the maximum number of rows that will be included in the search for the keywords above and below in <user direction>",
 )
 
@@ -38,61 +38,47 @@ def navigation_target(m) -> re.Pattern:
 @mod.action_class
 class Actions:
 
-    def test():
-        """moves the cursor to the given column"""  
-        rightSymbol = r"\)"
-        rightText = get_text_down(5)
-        #for index in range(0,5):
-            #rightMatch = match_forward(rightSymbol,rightText)
-
-    def jump_column(column: int):
-        """moves the cursor to the given column"""  
-        actions.edit.line_start()
-        for index in range(0, column):
-            actions.edit.right()
-
-    def extra(descriptor: str, direction: str):
+    def extend(descriptor: str, direction: str):
         """extend selection to specified direction until before the specified symbol"""  
         lengthLeftText=0
         lineCursorPosition=None
 
         if direction == "LEFT" or direction=="BOTH":
-            if actions.edit.selected_text()!=None:
-                #clearing selection without moving the cursor
-                actions.edit.left()
-                actions.edit.right()
-            #saving the position in the current line; doing this twice to also include tabs
-            actions.edit.extend_line_start()
-            actions.edit.extend_line_start()
+            selection_clear()
+            #saving the position in the current line
+            extend_line_start()
             lineCursorPosition=len(actions.edit.selected_text())
 
             for index in range(0, text_navigation_max_line_search.get()):
                 actions.edit.extend_up()
-            actions.edit.extend_line_start()
+            
             lengthLeftText=len( actions.edit.selected_text())
             actions.edit.left()
             
             for index in range(0, text_navigation_max_line_search.get()):
                 actions.edit.extend_down()
 
-            #correcting cursor position before extending the selection in the current line; doing this twice to also include tabs
-            actions.edit.extend_line_start()
-            actions.edit.extend_line_start()
-
-            for index in range(0, lineCursorPosition):
-                actions.edit.extend_right()
+            extend_to_column(lineCursorPosition)
                 
         if direction == "RIGHT" or direction=="BOTH":
             for index in range(0, text_navigation_max_line_search.get()):
                 actions.edit.extend_down()
             actions.edit.extend_line_end()
 
-        text = actions.edit.selected_text()
-        #actions.edit.select_none() moves the cursor to the end of the selection, but actions.edit.left() only clears the selection
-        actions.edit.left()
+        text = actions.edit.selected_text()        
+        
+        if direction == "LEFT": 
+            actions.edit.right()
+        if direction == "RIGHT" :
+            actions.edit.left()
+        if direction=="BOTH":
+            actions.edit.left()
+            for index in range(0, text_navigation_max_line_search.get()):
+                actions.edit.down()
+            jump_column(lineCursorPosition)
 
-        leftSymbol = r"\("
-        rightSymbol = r"\)"
+        leftSymbolPattern = re.compile(r"\(")
+        rightSymbolPattern = re.compile(r"\)")
 
         leftExtend=0
         rightExtend=0
@@ -100,29 +86,25 @@ class Actions:
         leftMatch=None
         rightMatch=None
 
-        #TODO amount of countermatches has to be saved for both ways, otherwise on the left '())' and on the right '(()' will not work!
-        #TODO on LEFT, the resulting match seemed correct, but the resulting selection and cursor movement seemed way off (and offset to the top)
+        #TODO extending to the left or both clears the original selection, but extending to the right does not!
         
         if direction == "LEFT" or direction == "BOTH":
-            reversedLeftText=text[lengthLeftText::-1]
-            leftMatch = match_forward(leftSymbol,reversedLeftText)
-            print(reversedLeftText)
+            print("searching for left match!")
+            reversedLeftText=text[lengthLeftText-1::-1]
+            leftMatch = match_forward(leftSymbolPattern,1,reversedLeftText)
+            print(leftMatch)
             
             if leftMatch != None:
                 counterText = reversedLeftText[:leftMatch.end()]
                 offset=leftMatch.end()
                 subText= reversedLeftText[offset:]
 
-                counterMatch = match_forward(rightSymbol, counterText) 
-                print(reversedLeftText)
+                counterMatchCount= count_matches(rightSymbolPattern, counterText) 
+                print(counterMatchCount) 
                 print(counterText)
-                print(leftMatch)
-                print(counterMatch)
-                print(subText)
-                
 
-                while(leftMatch != None and counterMatch != None):
-                    leftMatch = match_forward(leftSymbol,subText) 
+                while(leftMatch != None and counterMatchCount !=0):
+                    leftMatch = match_forward(leftSymbolPattern,counterMatchCount,subText)
                     print(leftMatch)
                 
                     if leftMatch != None:
@@ -130,32 +112,30 @@ class Actions:
                         offset+=leftMatch.end()
                         subText= reversedLeftText[offset:]
 
-                        counterMatch = match_forward(rightSymbol, counterText)
-                        print(counterMatch) 
+                        counterMatchCount= count_matches(rightSymbolPattern, counterText) 
+                        print(counterMatchCount) 
                         print(counterText)
 
                 if leftMatch != None:
-                    leftExtend=offset
+                    leftExtend=offset-1
 
         if direction == "RIGHT" or direction == "BOTH":
+            print("searching for right match!")
             rightText=text[lengthLeftText:]
-            rightMatch = match_forward(rightSymbol,rightText)
+            rightMatch = match_forward(rightSymbolPattern,1,rightText)
+            print(rightMatch)
             
             if rightMatch != None:
                 counterText = rightText[:rightMatch.end()]
                 offset=rightMatch.end()
                 subText= rightText[offset:]
 
-                counterMatch = match_forward(leftSymbol, counterText) 
-                print(rightText)
+                counterMatchCount= count_matches(leftSymbolPattern, counterText) 
+                print(counterMatchCount) 
                 print(counterText)
-                print(rightMatch)
-                print(counterMatch)
-                print(subText)
-                
 
-                while(rightMatch != None and counterMatch != None):
-                    rightMatch = match_forward(rightSymbol,subText) 
+                while(rightMatch != None and counterMatchCount != 0):
+                    rightMatch = match_forward(rightSymbolPattern,counterMatchCount,subText) 
                     print(rightMatch)
                 
                     if rightMatch != None:
@@ -163,13 +143,13 @@ class Actions:
                         offset+=rightMatch.end()
                         subText= rightText[offset:]
 
-                        counterMatch = match_forward(leftSymbol, counterText)
-                        print(counterMatch) 
+                        counterMatchCount= count_matches(leftSymbolPattern, counterText) 
+                        print(counterMatchCount) 
                         print(counterText)
             
 
                 if rightMatch != None:
-                    rightExtend=offset
+                    rightExtend=offset-1
 
         if leftMatch!=None:
             for index in range(0,leftExtend):
@@ -179,16 +159,14 @@ class Actions:
         
         if rightMatch != None:
             for index in range(0,rightExtend):
-                actions.edit.extend_right()
+                actions.edit.extend_right()                
 
-        if leftMatch==None and rightMatch==None and lineCursorPosition!=None:
-            #corrects the cursor position if necessary
-            for index in range(0,lineCursorPosition):
-                actions.edit.right()
-                
+        #correct cursor position;TODO why?
+        #if direction == "BOTH" and (leftMatch!=None or rightMatch!= None):
+         #   actions.edit.extend_left()                
         
 def get_text_left():
-    actions.edit.extend_line_start()
+    extend_line_start()
     text = actions.edit.selected_text()
     actions.edit.right()
     return text
@@ -206,7 +184,7 @@ def get_text_up():
     actions.edit.line_end()
     for j in range(0, text_navigation_max_line_search.get()):
         actions.edit.extend_up()
-    actions.edit.extend_line_start()
+    extend_line_start()
     text = actions.edit.selected_text()
     actions.edit.right()
     return text
@@ -215,7 +193,7 @@ def get_text_up():
 def get_cursor_position():
     #   TODO don't clear selection
     actions.edit.select_none()
-    actions.edit.extend_line_start()
+    extend_line_start()
     cursorPosition =len(actions.edit.selected_text())
     actions.user.jump_column(cursorPosition)
     return cursorPosition
@@ -229,26 +207,130 @@ def get_text_down(maxLines):
 
     return text
 
-def match_forward(regex:str, text:str):
-    return re.search(regex,text)
+def match_backwards(regex, occurrence_number, text):
+    try:
+        match = list(regex.finditer(text))[-occurrence_number]
+        return match
+    except IndexError:
+        return
 
-def match_backwards(regex:str, text:str):
-    reversedText=text[::-1]
-    return re.search(regex,reversedText)
-#def match_backwards(regex, occurrence_number, subtext):
-#    try:
-#        match = list(re.finditer(regex,subtext))[-occurrence_number]
-#        return match
-#    except IndexError:
-#        return
+def count_matches(regex,text):
+    return len(regex.findall(text))
 
-#def match_forward(regex, occurrence_number, sub_text):
-#        """moves the cursor to the given column"""  
- #       try:
- #           match = next(
-  #              itertools.islice(re.finditer(regex, sub_text), occurrence_number - 1, None)
-   #         )
-    #        return match
-     #   except StopIteration:
-      #      return None
+def match_forward(regex, occurrence_number, text):
+        try:
+            match = next(
+                itertools.islice(regex.finditer(text), occurrence_number - 1, None)
+            )
+            return match
+        except StopIteration:
+            return None
 
+def determine_selection_direction():
+        og_selection_size = len(actions.edit.selected_text())
+
+        actions.edit.extend_left()
+        new_selection_size = len(actions.edit.selected_text())
+
+        #return selection to original state
+        actions.edit.extend_right()
+
+        if(new_selection_size==1):
+            #special case; og_selection might contain the whole line (which could be of an arbitrary size)
+            actions.edit.extend_left()
+            actions.edit.extend_left()
+            actions.edit.extend_left()
+            third_test_selection_size = len(actions.edit.selected_text())
+
+            #return selection to original state
+            actions.edit.extend_right()
+            actions.edit.extend_right()
+            actions.edit.extend_right()
+
+            assert(third_test_selection_size==1 or third_test_selection_size==3)
+
+            if(third_test_selection_size==1):
+                #selection started from the left
+                return -1
+            else:
+                #nothing is selected -> no actions necessary
+                return 0
+        elif(og_selection_size==1):
+            #special case; new_selection might contain the whole line (which could be of an arbitrary size)
+            actions.edit.extend_left()
+            actions.edit.extend_left()
+            third_test_selection_size = len(actions.edit.selected_text())
+
+            #return selection to original state
+            actions.edit.extend_right()
+            actions.edit.extend_right()
+
+            if(third_test_selection_size==1):
+                #selection started from the left
+                return -1
+            else:
+                #selection started from the right
+                return 1
+
+        elif(og_selection_size> new_selection_size):
+            #selection started from the left
+            return -1
+        elif(new_selection_size> og_selection_size):
+            #selection started from the right
+            return 1
+
+
+def is_start_of_line():
+    direction = determine_selection_direction()
+
+    if(direction == -1):
+        selection = actions.edit.selected_text()
+        return selection[len(selection)-1]=='\n'
+    elif(direction == 0 or direction == 1):
+        actions.edit.extend_left()
+        selection = actions.edit.selected_text()
+        actions.edit.extend_right()
+        return selection[0]=='\n'
+    else:
+        raise ValueError("direction invalid: %d" %direction)
+
+def extend_line_start():
+    actions.edit.extend_line_start()
+    if(not is_start_of_line()):
+        actions.edit.extend_line_start()
+
+def line_start():
+    actions.edit.line_start()
+    if(not is_start_of_line()):
+        actions.edit.line_start()
+
+
+def jump_column(column: int):
+    """moves the cursor to the given column"""  
+    line_start()
+    if(not is_start_of_line()):
+        line_start()
+    
+    for index in range(0, column):
+        actions.edit.right()
+
+def extend_to_column(column: int):
+    """extends the selection to the given column (from the left)"""  
+    #correcting cursor position before extending the selection in the current line; doing this twice to also include whitespace
+    extend_line_start()
+
+    for index in range(0, column):
+        actions.edit.extend_right()
+
+def selection_clear():
+    direction = determine_selection_direction()
+
+    if(direction == -1):
+        actions.edit.left()
+    elif(direction == 0):
+        #nothing is selected -> no actions necessary
+        return
+    elif(direction == 1):
+        actions.edit.right()
+    else:
+        raise ValueError("direction invalid: %d" %direction)
