@@ -8,7 +8,7 @@ ctx = Context()
 text_navigation_max_line_search = mod.setting(
     "text_navigation_max_line_search",
     type=int,
-    default=2,
+    default=1,
     desc="the maximum number of rows that will be included in the search for the keywords above and below in <user direction>",
 )
 
