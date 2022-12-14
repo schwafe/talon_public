@@ -1,6 +1,6 @@
 import itertools
 import re
-from talon import ctrl, ui, Module, Context, actions, clip
+from talon import Module, Context, actions
 
 mod = Module()
 ctx = Context()
