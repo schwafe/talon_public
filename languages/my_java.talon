@@ -11,9 +11,7 @@ open:
 
 new:
  insert("new ")
- 
-(assign|set):
- insert(" = ")
+
  
 equals:
  insert(" == ")
@@ -30,21 +28,12 @@ is lesser than:
 logger token:
  insert("{}")
  
-todo:
- insert("TODO ")
- 
 string:
  insert("String ")
  
 boolean:
  insert("boolean ")
- 
-true:
- insert("true;")
- 
-false:
- insert("false;")
-  
+   
 and:
  insert("&& ") 
   
@@ -96,4 +85,4 @@ hash set:
  insert("HashSet<>();")
  
 hash map:
- insert("HashMap1<>();")
+ insert("HashMap<>();")
