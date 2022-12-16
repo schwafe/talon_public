@@ -5,12 +5,6 @@ include:
  
 null:
     insert("NULL ")
-
-void:
-    insert("void ")
-    
-return:
-    insert("return ")
 	
 size (off|of):
 	insert("sizeof(")
@@ -18,5 +12,3 @@ size (off|of):
 malloc:
 	insert("malloc(")
 	
-for loop:
-	insert("for(")

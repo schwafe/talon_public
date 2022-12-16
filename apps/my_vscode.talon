@@ -22,3 +22,11 @@ problem fix: user.vscode("problems.action.showQuickFixes")
 rename that: user.vscode("editor.action.rename")
 
 comment: user.vscode("editor.action.commentLine")
+
+make and run:
+    user.vscode("workbench.action.terminal.focus")
+    insert('make')
+    key(enter)
+    sleep(1)
+    insert('./build/eda.out')
+    key(enter)

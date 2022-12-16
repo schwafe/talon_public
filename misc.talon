@@ -5,3 +5,6 @@ indi|indicators:
 caret:
     insert("^")
     key(space)
+
+sudo apt install:
+    insert("sudo apt install ")
