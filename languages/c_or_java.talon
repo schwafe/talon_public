@@ -26,6 +26,8 @@ semi:
 increment:
 	insert('++')
 
+decrement:
+    insert('--')
     
 void:
     insert("void ")
@@ -37,7 +39,7 @@ return:
 for loop:
 	insert("for(")
  
-if statement:
+state if:
  insert("if(")
  
 else:
@@ -45,10 +47,10 @@ else:
  key(enter)
 
  
-logical and:
+ (logical|lodge) and:
     insert("&& ") 
      
-logical or:
+(logical|lodge) or:
     insert("|| ")   
          
 equals:
@@ -57,8 +59,14 @@ equals:
 does not equal:
     insert(" != ")
     
-is greater than:
+[is] greater than:
     insert(" > ")
     
-is lesser than:
+[is] lesser than:
     insert(" < ")
+
+[is] greater or equal:
+    insert(" >= ")
+
+[is] lesser or equal:
+    insert(" <= ")
