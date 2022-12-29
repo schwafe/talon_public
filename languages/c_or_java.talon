@@ -46,8 +46,7 @@ else:
  insert("else {")
  key(enter)
 
- 
- (logical|lodge) and:
+(logical|lodge) and:
     insert("&& ") 
      
 (logical|lodge) or:
