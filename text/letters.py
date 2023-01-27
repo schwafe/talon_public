@@ -31,6 +31,7 @@ letters_dictionary = {
     'plex' : 'x',
     'yank' : 'y',
     'zip' : 'z',
+    'space' : ' ',
 }
 
 ctx.lists["self.letters"] = letters_dictionary.keys()
