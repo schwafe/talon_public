@@ -62,12 +62,6 @@ ctx.lists["user.extend_direction"] = [
 ]
 
 
-# @mod.capture(rule="{user.extend_symbol}")
-# def extend_symbol(m) -> re.Pattern:
-#     """A target symbol to extend to. Returns a regular expression."""
-#     return re.compile(m.extend_symbol, re.IGNORECASE)
-
-
 @mod.action_class
 class Actions:
 
@@ -277,32 +271,26 @@ def match_forward(regex, occurrence_number, text):
 
 
 def determine_selection_direction():
+    selection_shift = 0
     og_selection_size = len(actions.edit.selected_text())
 
     actions.edit.extend_left()
+    selection_shift -= 1
     new_selection_size = len(actions.edit.selected_text())
-
-    # return selection to original state
-    actions.edit.extend_right()
 
     if (new_selection_size == 1):
         # special case; og_selection might contain the whole line (which could be of an arbitrary size)
-        actions.edit.extend_left()
-        actions.edit.extend_left()
-        actions.edit.extend_left()
+        actions.user.extend_left(2)
+        selection_shift -= 2
         third_test_selection = actions.edit.selected_text()
         third_test_selection_size = len(third_test_selection)
-
-        # return selection to original state
-        actions.edit.extend_right()
-        actions.edit.extend_right()
-        actions.edit.extend_right()
 
         # TODO handle+ special case better? can't use operating system alone, but maybe in combination with WSL?("paths.c - eda (Workspace) [WSL: Ubuntu] - Visual Studio Code")
         # special case when files only use LF as line break, instead of CRLF (selection size = 2)
         assert (third_test_selection_size == 1 or third_test_selection_size == 3 or (third_test_selection_size ==
                 2 and third_test_selection.endswith("\n") and not third_test_selection.endswith("\r\n")))
 
+        extend_left_or_right(-selection_shift)
         if (third_test_selection_size == 1):
             # selection started from the left
             return -1
@@ -311,14 +299,11 @@ def determine_selection_direction():
             return 0
     elif (og_selection_size == 1):
         # special case; new_selection might contain the whole line (which could be of an arbitrary size)
-        actions.edit.extend_left()
-        actions.edit.extend_left()
+        actions.user.extend_left(1)
+        selection_shift -= 1
         third_test_selection_size = len(actions.edit.selected_text())
 
-        # return selection to original state
-        actions.edit.extend_right()
-        actions.edit.extend_right()
-
+        extend_left_or_right(-selection_shift)
         if (third_test_selection_size == 1):
             # selection started from the left
             return -1
@@ -328,9 +313,11 @@ def determine_selection_direction():
 
     elif (og_selection_size > new_selection_size):
         # selection started from the left
+        extend_left_or_right(-selection_shift)
         return -1
     elif (new_selection_size > og_selection_size):
         # selection started from the right
+        extend_left_or_right(-selection_shift)
         return 1
 
 
@@ -370,6 +357,12 @@ def jump_column(column: int):
     for index in range(0, column):
         actions.edit.right()
 
+def extend_left_or_right(left_or_right_value: int):
+    "extends left or right depending on the value! - values for left, + for right, 0 = nothing"
+    if(left_or_right_value < 0):
+        actions.user.extend_left(-left_or_right_value)
+    elif(left_or_right_value > 0):
+        actions.user.extend_right(left_or_right_value)
 
 def extend_to_column(column: int):
     """extends the selection to the given column (from the left)"""

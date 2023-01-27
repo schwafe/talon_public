@@ -1,7 +1,8 @@
 from talon import (
     Module,
     actions,
-    imgui
+    imgui,
+    app
 )
 
 mod = Module()
@@ -20,7 +21,7 @@ def button_exit_deep_sleep(gui: imgui.GUI):
 class Actions:
         
     def enter_command_mode():
-        """Enters command mode and sets modus_operandi and mouse control"""
+        """Enters command mode"""
         actions.mode.disable("sleep")
         actions.mode.disable("user.deep_sleep")
         actions.mode.disable("dictation")
@@ -40,3 +41,11 @@ class Actions:
     def show_exit_deep_sleep_button():
         """Shows the "Exit deep sleep" button"""
         button_exit_deep_sleep.show()
+
+    def enter_command_mode_with_mouse_control():
+        """Enters command mode and sets modus_operandi and mouse control"""
+        actions.user.mouse_set_primary_mode()
+        actions.user.enter_command_mode()
+        actions.user.turnOnMouseControl()
+
+    app.register("ready",enter_command_mode_with_mouse_control )

@@ -1,0 +1,1 @@
+symbol <user.symbols>: '{user.symbols}'

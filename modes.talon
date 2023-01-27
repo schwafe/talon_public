@@ -1,6 +1,15 @@
 not mode: user.deep_sleep
 -
-^parrot mode$:
+
+^dictation mode$:
+	user.mouse_set_tertiary_mode()
+    user.enter_dictation_mode()
+	user.turnOffMouseControl()
+	
+^command mode$:
+	user.enter_command_mode_with_mouse_control()
+
+^parrot mode on$:
 	print("enabling parrot mode")
 	mode.enable("user.parrot")
 	user.show_parrot_on_button()

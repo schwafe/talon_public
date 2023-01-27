@@ -1,10 +1,8 @@
 app: vscode
 -
-tag(): user.find_and_replace
-tag(): user.line_commands
-tag(): user.snippets
-tag(): user.splits
-tag(): user.tabs
+#tag(): user.find_and_replace
+#tag(): user.line_commands
+#tag(): user.tabs
 
 # Language Features
 suggest show: user.vscode("editor.action.triggerSuggest")
@@ -21,12 +19,4 @@ problem last: user.vscode("editor.action.marker.prevInFiles")
 problem fix: user.vscode("problems.action.showQuickFixes")
 rename that: user.vscode("editor.action.rename")
 
-comment: user.vscode("editor.action.commentLine")
-
-make and run:
-    user.vscode("workbench.action.terminal.focus")
-    insert('make')
-    key(enter)
-    sleep(1)
-    insert('./build/eda.out')
-    key(enter)
+comment that: user.vscode("editor.action.commentLine")
