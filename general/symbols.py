@@ -6,7 +6,6 @@ mod.list("symbols", desc="list of symbols")
 
 symbols_dictionary = {
     "amper": "&",
-    #'args':'(', only in coding
     "arrow": "->",
     "at sign": "@",
     'backslash':'\\',
