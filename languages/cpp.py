@@ -12,9 +12,9 @@ mod.list(
     desc='types in cpp',
 )
 ctx.lists['user.cpp_types'] = {
-    'vector': 'vector',
+    'vector': 'std::vector',
     'integer': 'int',
-    'string': 'string',
+    'string': 'std::string',
     'auto': 'auto',
 }
 
@@ -44,7 +44,7 @@ mod.list(
     desc='operators in cpp',
 )
 ctx.lists['user.cpp_operators'] = {
-    'open', 'complete', 'equals', 'does not equal', 'todo', 'scope', 'increment', 'set','reference', 'and','or'}
+    'open', 'complete', 'equals', 'does not equal', 'todo', 'scope', 'increment', 'set','assign','reference','args', 'and','or'}
 
 
 @mod.action_class
@@ -68,14 +68,17 @@ class Actions:
             actions.insert('::')
         elif (operator == 'increment'):
             actions.insert('++')
-        elif (operator == 'set'):
+        elif (operator == 'set'or operator == 'assign'):
             actions.insert(' = ')
         elif (operator == 'reference'):
             actions.insert('&')
+        elif (operator == 'args'):
+            actions.insert('(')
         elif (operator == 'and'):
             actions.insert(' && ')
         elif (operator == 'or'):
             actions.insert(' || ')
+
 
     def call_construct(construct: str):
         'calls functions for given construct'
