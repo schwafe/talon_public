@@ -2,7 +2,7 @@ from talon import Context, Module
 
 mod = Module()
 ctx = Context()
-mod.list("letters", desc="list of letters")
+mod.list("letter", desc="list of letter names")
 
 letters_dictionary = {
     'air' : 'a',
@@ -31,12 +31,11 @@ letters_dictionary = {
     'plex' : 'x',
     'yank' : 'y',
     'zip' : 'z',
-    'space' : ' ',
 }
 
-ctx.lists["self.letters"] = letters_dictionary.keys()
+ctx.lists["self.letter"] = letters_dictionary
 
-@mod.capture(rule="{self.letters}+")
+@mod.capture(rule="{self.letter}+")
 def letters_all_caps(m) -> int:
     """Returns a single symbol"""
     return "".join([letters_dictionary[letter] for letter in m.letters_list]).upper()
@@ -52,27 +51,28 @@ modifier_keys = {
 
 ctx.lists["self.modifier_key"] = modifier_keys
 
-@mod.capture(rule="{self.modifier_key}+ {self.letters}")
-def keystroke(m) -> str:
-    "One keystroke"
-    modifiers= "-".join(m.modifier_key_list)
-    return modifiers+"-"+letters_dictionary[m.letters]
+mod.list("punctuation_symbol", desc="space, period and comma")
+punctuation_symbols = {
+    'comma': ',',  
+    'coma': ',',  
+    'dot': '.',
+    'period': '.',
+    'space': ' ',
+}
 
-
-@mod.capture(rule="shift {self.letters}")
+ctx.lists["self.punctuation_symbol"] = punctuation_symbols
+    
+@mod.capture(rule="shift {self.letter}")
 def uppercase_letter(m) -> str:
-    "One uppercase_letter"
-    return letters_dictionary[m.letters].upper()
+    "One uppercase letter"
+    return m.letter.upper()
+    
+@mod.capture(rule="<self.uppercase_letter>|{self.letter}")
+def mixedcase_letter(m) -> str:
+    "One letter, either upper- or lowercase"
+    return m[0]
 
-@mod.capture(rule="(<self.uppercase_letter>| {self.letters})+")
-def letters_mixed(m) -> str:
-    "One or more modifier keys"
-    letters =""
-    for letter in m:
-        if len(letter) > 1:
-            #not uppercase
-            letters += letters_dictionary[letter]
-        else:
-            letters += letter
-
-    return letters
+@mod.capture(rule="<self.mixedcase_letter>|{self.punctuation_symbol}")
+def letter_or_symbol(m) -> str:
+    "One letter or symbol"
+    return m[0]

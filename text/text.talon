@@ -4,9 +4,9 @@ say [<user.formatters>] <user.text>$: user.insert_formatted(user.formatters or "
 
 num <user.number_string>: "{number_string}"
 
-ship <user.letters_all_caps>$: "{letters_all_caps}"
-letters <user.letters_mixed>$:"{letters_mixed}"
-keys <user.keystroke>$: key(keystroke)
+ship <user.letter_or_symbol>+$: user.insert_formatted("hammer",user.letter_or_symbol_list)
+letters <user.letter_or_symbol>+$: user.insert_formatted("smash", user.letter_or_symbol_list)
+keystroke <user.keystroke>$: key(keystroke)
 
 cut that:
     edit.cut()
@@ -60,6 +60,12 @@ go down:
 
 go up:
     edit.up()
+
+go left:
+    edit.left()
+
+go right:
+    edit.right()
 
 indent less:
     edit.indent_less()
