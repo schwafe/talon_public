@@ -4,16 +4,10 @@ import os
 from talon import (
     Module,
     actions,
-    app,
-    clip,
     cron,
     ctrl,
-    imgui,
     noise,
-    ui,
 )
-from talon_plugins import eye_mouse, eye_zoom_mouse
-from talon_plugins.eye_mouse import config, toggle_camera_overlay
 
 tracking = actions.tracking
 
