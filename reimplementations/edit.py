@@ -148,13 +148,21 @@ class EditActions:
 
     def select_all():
         actions.key("ctrl-a")
-            
+        
     def select_line(n: int = None):
         if(n != None):
             actions.edit.jump_line(n)
         actions.edit.line_end()
-        actions.edit.extend_line_up()
-        actions.edit.extend_line_end()
+        actions.edit.extend_line_start()
+
+    #this works perfectly for any multiline field or file (also selects beginning tabs) but does not work for any single line field
+    #and since editors like vscode have both singleline fields and multiline files it cannot be implemented on application to application basis
+    # def select_line(n: int = None):
+    #     if(n != None):
+    #         actions.edit.jump_line(n)
+    #     actions.edit.line_end()
+    #     actions.edit.extend_line_up()
+    #     actions.edit.extend_line_end()
 
     def select_none():
         if(actions.edit.selected_text() != None):
