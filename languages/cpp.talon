@@ -16,6 +16,8 @@ val {user.cpp_values} : '{user.cpp_values}'
     insert("{user.cpp_types} ")
     user.insert_formatted( "camel", user.text)
 
+sym <user.symbols>: '{user.symbols}'
+
 op in <user.text>$: 
     insert(" : ")
     user.insert_formatted( "camel", user.text)

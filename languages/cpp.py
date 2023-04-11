@@ -16,6 +16,7 @@ ctx.lists['user.cpp_types'] = {
     'integer': 'int',
     'string': 'std::string',
     'auto': 'auto',
+    'void': 'void',
 }
 
 mod.list(
@@ -44,7 +45,7 @@ mod.list(
     desc='operators in cpp',
 )
 ctx.lists['user.cpp_operators'] = {
-    'open', 'complete', 'equals', 'does not equal', 'todo', 'scope', 'increment', 'set','assign','reference','args', 'and','or'}
+    'open', 'complete', 'equals', 'does not equal', 'todo', 'scope', 'increment', 'set','assign','reference','ref','args', 'and','or'}
 
 
 @mod.action_class
@@ -70,7 +71,7 @@ class Actions:
             actions.insert('++')
         elif (operator == 'set'or operator == 'assign'):
             actions.insert(' = ')
-        elif (operator == 'reference'):
+        elif (operator == 'reference'or operator == 'ref'):
             actions.insert('&')
         elif (operator == 'args'):
             actions.insert('(')
